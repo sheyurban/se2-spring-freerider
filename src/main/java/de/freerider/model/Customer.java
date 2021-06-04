@@ -16,7 +16,7 @@ public class Customer {
     Deleted,
   }
 
-  Customer(String lastName, String firstName, String contact) {
+  public Customer(String lastName, String firstName, String contact) {
     this.lastName = lastName;
     this.firstName = firstName;
     this.contact = contact;
@@ -62,5 +62,10 @@ public class Customer {
 
   public void setStatus(Status status) {
     this.status = status;
+  }
+
+  @Override
+  public String toString() {
+    return "\nCustomer: " + id + " (" + firstName + " " + lastName + ")";
   }
 }
