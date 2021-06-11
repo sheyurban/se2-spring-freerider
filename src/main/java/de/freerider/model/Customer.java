@@ -8,7 +8,7 @@ public class Customer {
   private String contact;
   private Status status;
 
-  private enum Status {
+  public enum Status {
     New,
     InRegistration,
     Active,
@@ -17,10 +17,18 @@ public class Customer {
   }
 
   public Customer(String lastName, String firstName, String contact) {
+    this.id = null;
     this.lastName = lastName;
     this.firstName = firstName;
     this.contact = contact;
+    this.status = Status.New;
+  }
+
+  public Customer() {
     this.id = null;
+    this.lastName = "";
+    this.firstName = "";
+    this.contact = "";
     this.status = Status.New;
   }
 
@@ -45,18 +53,31 @@ public class Customer {
   }
 
   public void setId(String id) {
-    this.id = id;
+    if (id != null && this.id != null) {
+      this.id = getId();
+    } else {
+      this.id = id;
+    }
   }
 
   public void setLastName(String lastName) {
+    if (lastName == null) {
+      lastName = "";
+    }
     this.lastName = lastName;
   }
 
   public void setFirstName(String firstName) {
+    if (firstName == null) {
+      firstName = "";
+    }
     this.firstName = firstName;
   }
 
   public void setContact(String contact) {
+    if (contact == null) {
+      contact = "";
+    }
     this.contact = contact;
   }
 
