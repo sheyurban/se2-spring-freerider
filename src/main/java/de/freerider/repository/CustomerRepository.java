@@ -19,27 +19,34 @@ public class CustomerRepository implements CrudRepository<Customer, String> {
   private Map<String, Customer> customerMap = new HashMap<String, Customer>();
 
   public <S extends Customer> S save(S entity) {
-    if (entity.getId() == "" || entity.getId() == null) {
-      String newId = idGen.nextId();
-      while (customerMap.containsKey(newId)) {
-        newId = idGen.nextId();
-      }
-      entity.setId(newId);
-      customerMap.put(entity.getId(), entity);
-    } else if (entity.getId() != "" || entity.getId() != null) {
-      if (customerMap.containsKey(entity.getId())) {
-        throw new IllegalArgumentException("This customer already exists.");
-      }
-      customerMap.put(entity.getId(), entity);
-    } else {
+    Customer newCustomer = entity;
+    if (entity == null) {
       throw new IllegalArgumentException();
+    } else {
+      if (entity.getId() == "" || entity.getId() == null) {
+        String newid = idGen.nextId();
+        while (customerMap.containsKey(newid)) {
+          newid = idGen.nextId();
+        }
+        entity.setId(newid);
+      }
+      newCustomer = customerMap.put(entity.getId(), entity);
+      if (newCustomer == null) {
+        return entity;
+      } else {
+        return (S) newCustomer;
+      }
     }
-    return entity;
   }
 
   public <S extends Customer> Iterable<S> saveAll(Iterable<S> entities) {
-    for (S s : entities) {
-      save(s);
+    if (entities == null) {
+      throw new IllegalArgumentException();
+    } else {
+      for (S s : entities) {
+        if (s == null) continue;
+        save(s);
+      }
     }
     return entities;
   }
@@ -70,14 +77,18 @@ public class CustomerRepository implements CrudRepository<Customer, String> {
 
   public Iterable<Customer> findAllById(Iterable<String> ids) {
     ArrayList<Customer> customerList = new ArrayList<Customer>();
-    for (String id : ids) {
-      if (id == null) {
-        throw new IllegalArgumentException();
-      } else if (customerMap.containsKey(id)) {
-        customerList.add(customerMap.get(id));
+    if (ids == null) {
+      throw new IllegalArgumentException();
+    } else {
+      for (String id : ids) {
+        if (id == null) {
+          throw new IllegalArgumentException();
+        } else if (customerMap.containsKey(id)) {
+          customerList.add(customerMap.get(id));
+        }
       }
+      return customerList;
     }
-    return customerList;
   }
 
   public long count() {
@@ -93,7 +104,7 @@ public class CustomerRepository implements CrudRepository<Customer, String> {
   }
 
   public void delete(Customer entity) {
-    if (entity == null) {
+    if (entity == null || entity.getId() == null) {
       throw new IllegalArgumentException();
     } else {
       customerMap.remove(entity.getId(), entity);
@@ -101,12 +112,14 @@ public class CustomerRepository implements CrudRepository<Customer, String> {
   }
 
   public void deleteAllById(Iterable<? extends String> ids) {
+    if (ids == null) throw new IllegalArgumentException();
     for (String id : ids) {
       deleteById(id);
     }
   }
 
   public void deleteAll(Iterable<? extends Customer> entities) {
+    if (entities == null) throw new IllegalArgumentException();
     for (Customer entity : entities) {
       delete(entity);
     }
