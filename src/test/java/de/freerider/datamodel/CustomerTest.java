@@ -1,12 +1,13 @@
-package de.freerider.model;
+package de.freerider.datamodel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import de.freerider.model.Customer.Status;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import de.freerider.datamodel.Customer.Status;
 
 @SpringBootTest
 public class CustomerTest {

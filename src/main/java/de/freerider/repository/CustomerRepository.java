@@ -1,13 +1,15 @@
 package de.freerider.repository;
 
-import de.freerider.model.Customer;
+import de.freerider.datamodel.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
+@Qualifier("CustomerRepository_Impl")
 public class CustomerRepository implements CrudRepository<Customer, String> {
 
   //

@@ -1,117 +1,90 @@
 package de.freerider;
 
-import de.freerider.model.Customer;
-import de.freerider.repository.CustomerRepository;
-import java.util.ArrayList;
-import java.util.List;
+import de.freerider.datamodel.Customer;
+import de.freerider.repository.CrudRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 public class Application {
 
+  @Autowired
+  private CrudRepository<Customer, String> customerRepository;
+
+  Application() {
+    log("Constructor()");
+  }
+
+  @Bean
+  CommandLineRunner runner() {
+    return args -> {
+      log("CommandLineRunner runner()");
+      /*
+			Customer c1 = new Customer( "Baerlinsky", "Max", "max3245@gmx.de" );
+			Customer c2 = new Customer( "Meyer", "Anne", "ma2958@gmx.de" );
+			c1.setStatus( Customer.Status.InRegistration );
+			c1.setId( "C020301" );
+			//
+			customerRepository.save( c1 );
+			customerRepository.save( c2 );
+			*/
+      long count = customerRepository.count(); // triggers loading data
+      System.out.println("CustomerRepository.count() -> " + count);
+      //
+      String id = "C020301";
+      customerRepository
+        .findById(id)
+        .ifPresentOrElse(
+          c -> {
+            log("Customer found", c);
+          },
+          () -> {
+            log("No Customer found for id: " + id, (Customer) null);
+          }
+        );
+    };
+  }
+
   @EventListener(ApplicationReadyEvent.class)
-  public void doWhenApplicationReady() {
-    System.out.println("Hello World!");
+  void doWhenApplicationReady() {
+    log("doWhenApplicationReady()");
   }
 
   public static void main(String[] args) {
+    log("main()");
+    //
     SpringApplication.run(Application.class, args);
+    //
+    log("main() leaving");
+  }
 
-    CustomerRepository repo = new CustomerRepository();
-
-    Customer customer1 = new Customer("Urban", "Shirley", "surban@mail.de");
-    Customer customer2 = new Customer("Hahn", "Nina", "akrasilnikov@mail.de");
-    Customer customer3 = new Customer("Thomas", "Nicole", "nthomas@mail.de");
-    Customer customer4 = new Customer("Müller", "Peter", "pmueller@mail.de");
-    Customer customer5 = new Customer("Schmidt", "Laura", "lschmidt@gmail.de");
-
-    repo.save(customer1);
-    System.out.println("Sollte 1 sein: " + repo.count());
-
-    System.out.println("____________________________________");
-
-    List<Customer> customerList = new ArrayList<Customer>();
-    customerList.add(customer2);
-    customerList.add(customer3);
-    customerList.add(customer4);
-    customerList.add(customer5);
-
-    repo.saveAll(customerList);
-    System.out.println("Sollte 5 sein: " + repo.count());
-
-    System.out.println("____________________________________");
-
+  public static void log(String msg, Customer customer) {
     System.out.println(
-      "Customer1: Shirley Urban -> \n" + repo.findById(customer1.getId())
+      msg +
+      (
+        customer == null
+          ? ""
+          : ": id:" +
+          customer.getId() +
+          ", " +
+          customer.getLastName() +
+          ", " +
+          customer.getFirstName() +
+          ", contact:" +
+          customer.getContact() +
+          ", status:\"" +
+          customer.getStatus() +
+          "\""
+      )
     );
+  }
 
-    System.out.println("____________________________________");
-
-    System.out.println(
-      "Sollte wahr sein (customer1 existiert): " +
-      repo.existsById(customer1.getId())
-    );
-
-    System.out.println("____________________________________");
-
-    System.out.println("Alle Customer: " + repo.findAll());
-
-    System.out.println("____________________________________");
-
-    List<String> ids = new ArrayList<String>();
-    ids.add(customer5.getId());
-    ids.add(customer4.getId());
-    System.out.println(
-      "Alle Customer aus ArrayList ids: " + repo.findAllById(ids)
-    );
-
-    System.out.println("____________________________________");
-    System.out.println(
-      customer1.getFirstName() +
-      " " +
-      customer1.getLastName() +
-      " sollte gelöscht sein:"
-    );
-
-    repo.deleteById(customer1.getId());
-    System.out.println(repo.findAll());
-
-    System.out.println("____________________________________");
-
-    System.out.println(
-      customer2.getFirstName() +
-      " " +
-      customer2.getLastName() +
-      " sollte gelöscht sein:"
-    );
-
-    repo.delete(customer2);
-    System.out.println(repo.findAll());
-
-    System.out.println("____________________________________");
-
-    repo.deleteAllById(ids);
-    System.out.println(
-      "Nur noch Customer 3 ist übrig (" +
-      customer3.getFirstName() +
-      " " +
-      customer3.getLastName() +
-      "): " +
-      repo.findAll()
-    );
-
-    System.out.println("____________________________________");
-    repo.deleteAll();
-    customerList.add(customer1);
-    repo.saveAll(customerList);
-    System.out.println(
-      "Zuerst wurden alle wieder hinzugefügt, um danach gelöscht zu werden aus einem Iterable (ArrayList):"
-    );
-    System.out.println(repo.findAll());
-    repo.deleteAll(customerList);
-    System.out.println("Leeres Repo: " + repo.findAll());
+  public static void log(String msg) {
+    //System.err.println( Application.class.getSimpleName() + "::" + msg );
   }
 }
